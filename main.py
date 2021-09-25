@@ -1,6 +1,7 @@
 from requests import request
 from bs4 import BeautifulSoup
 import re
+import json
 
 URL = 'https://rezka.ag/'
 URL_SEARCH = 'https://rezka.ag/search/?do=search&subaction=search&q='
@@ -11,7 +12,7 @@ def soap(html):
     return BeautifulSoup(html, 'html.parser')
 
 def get_page(url):
-    return request('GET', url).text
+    return request('GET', url, headers={"user-agent": "Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 YaBrowser/21.8.3.767 (beta) Yowser/2.5 Safari/537.36"}).text
 
 class Something:
     '''Нечто из мира фильмов, сериалов, мультфильмов и аниме'''
@@ -99,12 +100,11 @@ num = int(input("Выберите то, что нужно посмотреть �
 elem = somethings[num-1]
 if (elem.state == 'Существует'):
     res = (elem.get_urls_mp4())
-
+	
+    print(json.loads(res)['url'].split(' ')[-1])
 elif(elem.state != 'Существует'):
     seas = int(input("Выберите сезон (%d сезон(ов)):\n"%len(elem.seasons)))
     ep = int(input("Выберите серию (%d - %d):\n"%(elem.seasons[seas-1][0],elem.seasons[seas-1][1])))
     res = (elem.get_urls_mp4(seas, ep))
-
-if (res.split(',')[0].split(':')[-1]=='true') :
     url_res = res.replace('\\', '').split(']')[-1][:-1].split(' ')
     print(url_res[0] if url_res[0][-3:] == 'mp4' else url_res[2].split('"')[0])
